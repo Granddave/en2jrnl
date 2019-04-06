@@ -37,7 +37,7 @@ Done!
 Parsed 2/2 posts from example/
 Now available in example/jrnl-output.txt
 
-$ cat examle/jrnl-output.txt
+$ cat example/jrnl-output.txt
 2019-04-05 12:50 190405
 Started writing my memoirs. On the command line.
 
