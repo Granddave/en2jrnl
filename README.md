@@ -14,6 +14,11 @@ Export your notebook in html format. run `en2jrnl.py` with `-i [export-directory
 To specify output file, pass `-o [outputfile]`. If `-o` isn't passed, the default file `jrnl.txt` will be used.
 
 
+## Dependencies
+
+* `html2text`
+
+
 ## Example
 
 Here is an export example from Evernote on Windows.
