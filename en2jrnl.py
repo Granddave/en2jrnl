@@ -12,6 +12,12 @@ def stripEmptyLines(s):
         lines.pop()
     return '\n'.join(lines)
 
+def dir_path(string):
+    if os.path.isdir(string):
+        return string
+    else:
+        raise NotADirectoryError(string)
+
 class Post():
     def __init__(self, filepath):
         self.filepath = filepath
@@ -22,54 +28,79 @@ class Post():
     def parseFile(self):
         if self.filepath is "":
             Print("Filename is empty")
-            return
+            return False
 
-        f = open(self.filepath, encoding="utf-8")
-        content = f.read()
-        dateRegex = re.findall(r'<tr><td><b>Created:<\/b><\/td><td><i>(\d*-\d*-\d* \d*:\d*)', content)
-        if len(dateRegex) > 0:
-            self.datetime = dateRegex[0]
-            print("Date:  " + self.datetime)
-        else:
-            print("Could not find date")
+        try:
+            with open(self.filepath, encoding="utf-8") as f:
+                content = f.read()
+                h = html2text.HTML2Text()
+                h.ignore_links = True
+                htmlContent = h.handle(content)
 
-        h = html2text.HTML2Text()
-        h.ignore_links = True
-        htmlContent = h.handle(content)
+                # Parse date.
+                dateRegex = re.findall(r'\*\*Created:\*\*\|.._(\d*-\d*-\d* \d*:\d*)_', htmlContent)
+                if len(dateRegex) > 0:
+                    self.datetime = dateRegex[0]
+                    print("Date:  " + self.datetime)
+                else:
+                    print("Could not find date")
+                    return False
 
-        # Set the first row as title, but without the pound sign before.
-        # Example: '# My title' -> 'My title'
-        self.title = htmlContent.split('\n', 1)[0][2:]
+                # Set the first row as title, but without the pound sign before.
+                # Example: '# My title' -> 'My title'
+                self.title = htmlContent.split('\n', 1)[0][2:]
+                print("Title: " + self.title)
 
-        self.content = '\n'.join(htmlContent.split('\n')[5:])
-        self.content = stripEmptyLines(self.content)
-        self.content = self.content.rstrip('\0')
-        print("Title: " + self.title)
+                # Remove date and empty lines. Any other better way?
+                self.content = '\n'.join(htmlContent.split('\n')[5:])
+                self.content = stripEmptyLines(self.content)
 
-    def writeToFile(self, outputfile):
-        with open(outputfile, "a") as f:
+                # Remove wierd trailing null byte.
+                self.content = self.content.rstrip('\0')
+
+                return True
+        except IOError as e:
+            print(e)
+            return False
+
+    def writeToFile(self, outputFile):
+        with open(outputFile, "a") as f:
             f.write(self.datetime + ' ' + self.title + '\n')
             f.write(self.content)
 
 def main():
-    outputfile = "loggbok.txt"
-    fileDir = "Evernote"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input", help="directory with exported html files to convert", type=dir_path, nargs=1, required=True)
+    parser.add_argument("-o", "--output", help="jrnl output file", nargs=1)
+    args = parser.parse_args()
 
-    filesToScan = sorted(os.listdir(fileDir))
-    filesToScan = [x for x in filesToScan if
-            os.path.isfile(x) or
-            x.endswith(".html")]
+    outputFile = "jrnl.txt"
+    if args.output is not None:
+        outputFile = args.output[0]
 
-    print("==============")
+    fileDir = args.input[0]
+    inputFiles = sorted(os.listdir(fileDir))
+    inputFiles = [f for f in inputFiles if f.endswith(".html") and "index" not in f]
+
+    print("Input directory:", fileDir)
+    print("Output file:    ", outputFile)
     count = 0
-    for f in filesToScan:
-        count = count + 1
-        print("Post " + str(count))
+    successful = 0
+    for f in inputFiles:
+        print("-------------------------")
+        count += 1
         print("Current file: " + f)
+        print("Post:  " + str(count))
         p = Post(fileDir + "/" + f)
-        p.parseFile()
-        p.writeToFile(outputfile)
-        print("--------------")
+        if p.parseFile() is False:
+            continue
+        successful += 1
+        p.writeToFile(outputFile)
+
+    print("-------------------------")
+    print("""Done!
+Parsed {}/{} posts from {}
+Now available in {}""".format(successful, count, fileDir, outputFile))
 
 if __name__ == '__main__':
     main()
