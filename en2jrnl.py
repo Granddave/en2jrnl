@@ -83,8 +83,8 @@ def parse_journal(directory, log_to_stdout=False):
             print(e)
             continue
         if log_to_stdout:
-            print(post.title)
-            print(post.datetime)
+            print(f"Date:  {post.datetime}")
+            print(f"Title: {post.title}")
         num_successful += 1
         journal += post.get_full_post()
 
