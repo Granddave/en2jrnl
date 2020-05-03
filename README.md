@@ -11,7 +11,7 @@ The creation date of the Evernote entry is used as creation date in Jrnl.
 
 Export your notebook in html format. run `en2jrnl.py` with `-i [export-directory]` where export-directory is the directory with all `.html` files.
 
-To specify output file, pass `-o [outputfile]`. If `-o` isn't passed, the default file `jrnl.txt` will be used.
+To specify output file, pass `-o [outputfile]`. If `-o` isn't passed, the journal will be printed to stdout.
 
 
 ## Dependencies
@@ -25,7 +25,7 @@ Here is an export example from Evernote on Windows.
 
 ```
 $ ./en2jrnl.py -i example/ -o example/jrnl-output.txt
-Input directory: example/
+Input directory: example
 Output file:     example/jrnl-output.txt
 -------------------------
 Current file: 190405.html
@@ -38,17 +38,16 @@ Post:  2
 Date:  2019-04-06 16:51
 Title: 190406
 -------------------------
-Done!
-Parsed 2/2 posts from example/
+Parsed 2/2 posts from example
 Now available in example/jrnl-output.txt
 
 $ cat example/jrnl-output.txt
-2019-04-05 12:50 190405
+[2019-04-05 12:50] 190405
 Started writing my memoirs. On the command line.
 
 Like a boss.
 
-2019-04-06 16:51 190406
+[2019-04-06 16:51] 190406
 I use jrnl to keep track of accomplished tasks.
 
 The done.txt for my todo.txt

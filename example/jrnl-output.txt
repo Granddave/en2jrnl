@@ -1,9 +1,9 @@
-2019-04-05 12:50 190405
+[2019-04-05 12:50] 190405
 Started writing my memoirs. On the command line.
 
 Like a boss.
 
-2019-04-06 16:51 190406
+[2019-04-06 16:51] 190406
 I use jrnl to keep track of accomplished tasks.
 
 The done.txt for my todo.txt
