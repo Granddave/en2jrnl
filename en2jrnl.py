@@ -15,7 +15,7 @@ def _strip_empty_lines(lines):
     return '\n'.join(lines)
 
 
-class Post():
+class Entry():
     def __init__(self, filepath):
         self.filepath = filepath
         self.datetime = None
@@ -49,9 +49,9 @@ class Post():
             self.content += '\n'*2
             self.is_parsed = True
 
-    def get_full_post(self):
+    def get_full_entry(self):
         if not self.is_parsed:
-            raise Exception("Post not parsed")
+            raise Exception("Entry not parsed")
         return f"[{self.datetime}] {self.title}\n{self.content}"
 
 
@@ -74,23 +74,23 @@ def parse_journal(directory, log_to_stdout=False):
         if log_to_stdout:
             print("-"*25)
             print("Current file: " + filename)
-            print("Post:  " + str(i+1))
+            print("Entry:  " + str(i+1))
 
-        post = Post(f"{directory}/{filename}")
+        entry = Entry(f"{directory}/{filename}")
         try:
-            post.parse_file()
+            entry.parse_file()
         except Exception as e:
             print(e)
             continue
         if log_to_stdout:
-            print(f"Date:  {post.datetime}")
-            print(f"Title: {post.title}")
+            print(f"Date:  {entry.datetime}")
+            print(f"Title: {entry.title}")
         num_successful += 1
-        journal += post.get_full_post()
+        journal += entry.get_full_entry()
 
     if log_to_stdout:
         print("-"*25)
-        print("Parsed {}/{} posts from {}".format(num_successful,
+        print("Parsed {}/{} entries from {}".format(num_successful,
                                                   len(input_files),
                                                   directory))
     return journal
